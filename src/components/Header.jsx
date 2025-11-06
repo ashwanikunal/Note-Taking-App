@@ -9,7 +9,7 @@ export default function Header( {onOpenNew,query,setQuery}) {
          value ={query}
          onChange={(e) => setQuery(e.target.value)}
          placeholder='Search notes...'
-         className = 'px-3 py-2 border rounded-md outline-none'/>
+         className = 'px-4 py-2 border rounded-md outline-none'/>
          <button onClick={onOpenNew}
          className='px-4 py-2 bg-blue-600 text-white rounded-md'>
             new

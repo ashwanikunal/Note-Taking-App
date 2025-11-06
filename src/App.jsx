@@ -3,9 +3,13 @@ import Header from "./components/Header";
 import NotesGrid from "./components/NotesGrid";
 import NoteEditor from "./components/NoteEditor";
 import useLocalStorage from "./hooks/useLocalStorage";
+import LandingPage from "./components/LandingPage";
 import { v4 as uuidv4 } from "uuid";
 
 function App() {
+  // 👇 New state for landing page
+  const [showLanding, setShowLanding] = useState(true);
+
   const [notes, setNotes] = useLocalStorage("notes_v1", []);
   const [isEditorOpen, setEditorOpen] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -18,14 +22,9 @@ function App() {
 
   function handleSave(note) {
     if (note.id) {
-      setNotes((prev) => prev.map(n => n.id === note.id ? { ...n, ...note } : n));
+      setNotes((prev) => prev.map((n) => (n.id === note.id ? { ...n, ...note } : n)));
     } else {
-      const newNote = {
-        ...note,
-        id: uuidv4(),
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      };
+      const newNote = { ...note, id: uuidv4(), createdAt: Date.now(), updatedAt: Date.now() };
       setNotes((prev) => [newNote, ...prev]);
     }
   }
@@ -36,34 +35,52 @@ function App() {
   }
 
   function handleDelete(id) {
-    setNotes((prev) => prev.filter(n => n.id !== id));
+    setNotes((prev) => prev.filter((n) => n.id !== id));
   }
 
   function toggleArchive(id) {
-    setNotes(prev => prev.map(n => n.id === id ? { ...n, archived: !n.archived } : n));
+    setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, archived: !n.archived } : n)));
   }
 
   function togglePin(id) {
-    setNotes(prev => prev.map(n => n.id === id ? { ...n, pinned: !n.pinned } : n));
+    setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, pinned: !n.pinned } : n)));
   }
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return notes.filter(n => !n.archived && (n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q)));
+    return notes.filter(
+      (n) =>
+        !n.archived &&
+        (n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q))
+    );
   }, [notes, query]);
 
+  // 👇 If still on landing, show LandingPage
+  if (showLanding) {
+    return <LandingPage onStart={() => setShowLanding(false)} />;
+  }
+
+  // 👇 After "Start", show main notes app
   return (
     <div className="min-h-screen bg-gray-100">
       <Header onOpenNew={openNew} query={query} setQuery={setQuery} />
       <main className="container mx-auto">
-        <NotesGrid notes={visible} onEdit={handleEdit} onDelete={handleDelete} onToggleArchive={toggleArchive} onTogglePin={togglePin} />
+        <NotesGrid
+          notes={visible}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onToggleArchive={toggleArchive}
+          onTogglePin={togglePin}
+        />
       </main>
-
       {isEditorOpen && (
         <NoteEditor
           initial={editing}
           onSave={handleSave}
-          onClose={() => { setEditorOpen(false); setEditing(null); }}
+          onClose={() => {
+            setEditorOpen(false);
+            setEditing(null);
+          }}
         />
       )}
     </div>
