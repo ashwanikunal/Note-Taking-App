@@ -2,13 +2,12 @@ import React, { useState, useEffect } from "react";
 import ColorPicker from "./ColorPicker";
 
 export default function NoteEditor({ onSave, onClose, initial }) {
-  // ✅ Proper useState hooks
+
   const [title, setTitle] = useState(initial?.title || "");
   const [content, setContent] = useState(initial?.content || "");
   const [color, setColor] = useState(initial?.color || "bg-white");
   const [pinned, setPinned] = useState(initial?.pinned || false);
 
-  // ✅ Make sure we update when editing an existing note
   useEffect(() => {
     if (initial) {
       setTitle(initial.title || "");
